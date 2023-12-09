@@ -3,7 +3,7 @@ package com.mycompany.biblioteca;
 import java.util.Scanner;
 
 public class Biblioteca {
-//hola 
+
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);

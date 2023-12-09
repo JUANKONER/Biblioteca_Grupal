@@ -2,7 +2,7 @@ package com.mycompany.biblioteca;
 
 import java.util.ArrayList;
 import java.util.List;
-//hola
+
 public class Libreria {
 
     private List<Libro> listaLibros;
