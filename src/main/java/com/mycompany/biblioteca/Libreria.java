@@ -33,6 +33,12 @@ public class Libreria {
         for (Libro libro : listaLibros) {
             if (libro.getNombre().equalsIgnoreCase(titulo)) {
                 librosEncontrados.add(libro);
+                System.out.println("-------------------------------------");
+                System.out.println("ID: " + libro.getId());
+                System.out.println("Nombre: " + libro.getNombre());
+                System.out.println("Autor: " + libro.getAutor());
+                System.out.println("Unidades Disponibles: " + libro.getUnidadesDisponibles());
+                System.out.println("-------------------------------------");
             }
         }
         return librosEncontrados;
