@@ -11,13 +11,11 @@ public class Libreria {
         this.listaLibros = new ArrayList<>();
     }
 
-   
     public void agregarLibro(Libro libro) {
 
         listaLibros.add(libro);
     }
 
-    
     public List<Libro> buscarPorAutor(String autor) {
         List<Libro> librosEncontrados = new ArrayList<>();
         boolean encontrado = false;
@@ -39,7 +37,6 @@ public class Libreria {
         return librosEncontrados;
     }
 
-    
     public List<Libro> buscarPorTitulo(String titulo) {
         List<Libro> librosEncontrados = new ArrayList<>();
         Boolean encontrado = false;
@@ -59,6 +56,15 @@ public class Libreria {
             System.out.println("No se encontraron libros del titulo: " + titulo);
         }
         return librosEncontrados;
+    }
+
+    public Libro buscarLibroPorId(int id) {
+        for (Libro libro : listaLibros) {
+            if (libro.getId() == id) {
+                return libro;
+            }
+        }
+        return null;
     }
 
     public void mostrarTodosLosLibros() {
