@@ -103,6 +103,7 @@ public class Biblioteca {
                             System.out.println("No se encontró ningún libro con el ID " + LibroAconsultar);
                             break;
                         }
+                        break;
                     case 7:
                         System.out.println("¡Hasta luego!");
                         break;
