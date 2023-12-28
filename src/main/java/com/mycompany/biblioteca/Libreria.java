@@ -20,7 +20,7 @@ public class Libreria {
         List<Libro> librosEncontrados = new ArrayList<>();
         boolean encontrado = false;
         for (Libro libro : listaLibros) {
-            if (libro.getAutor().equalsIgnoreCase(autor)) {
+            if (libro.getAutor().equalsIgnoreCase(autor)|| libro.getAutor().contains(autor)) {
                 librosEncontrados.add(libro);
                 encontrado = true;
                 System.out.println("-------------------------------------");
@@ -84,5 +84,12 @@ public class Libreria {
             }
         }
     }
+    
+    public static void ModificarUnidades(Libro libro, int cantidad) {
+        int unidadesActuales = libro.getUnidadesDisponibles();
+        libro.setUnidadesDisponibles(unidadesActuales + cantidad);
+    }
+
+
 
 }
