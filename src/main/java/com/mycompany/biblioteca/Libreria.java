@@ -41,7 +41,7 @@ public class Libreria {
         List<Libro> librosEncontrados = new ArrayList<>();
         Boolean encontrado = false;
         for (Libro libro : listaLibros) {
-            if (libro.getNombre().equalsIgnoreCase(titulo)) {
+            if (libro.getNombre().equalsIgnoreCase(titulo)|| libro.getNombre().contains(titulo)) {
                 librosEncontrados.add(libro);
                 encontrado = true;
                 System.out.println("-------------------------------------");
