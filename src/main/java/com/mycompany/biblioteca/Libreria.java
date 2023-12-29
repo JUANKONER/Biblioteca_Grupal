@@ -8,18 +8,26 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileOutputStream;
 
-
 public class Libreria {
 
     private List<Libro> listaLibros;
 
     public Libreria() {
         this.listaLibros = new ArrayList<>();
+        cargarDatosDesdeExcel("ListaLibros.xlsx");
     }
 
     public void agregarLibro(Libro libro) {
+        boolean idExistenteEnLista = listaLibros.stream().anyMatch(lib -> lib.getId() == libro.getId());
+        boolean idExistenteEnExcel = existeIdEnExcel(libro.getId(), "ListaLibros.xlsx");
 
-        listaLibros.add(libro);
+        if (idExistenteEnExcel) {
+            System.out.println("El ID del libro ya existe. Por favor, elige otro ID único.");
+        } else {
+            listaLibros.add(libro);
+            guardarLibrosEnExcel("ListaLibros.xlsx");
+            System.out.println("Libro agregado con éxito.");
+        }
     }
 
     public List<Libro> buscarPorAutor(String autor) {
@@ -77,66 +85,106 @@ public class Libreria {
         if (listaLibros.isEmpty()) {
             System.out.println("La librería está vacía.");
         } else {
+            boolean librosEncontrados = false;
             System.out.println("-------------------------------------");
             System.out.println("Lista de libros en la librería:");
             for (Libro libro : listaLibros) {
-                System.out.println("-------------------------------------");
-                System.out.println("ID: " + libro.getId());
-                System.out.println("Nombre: " + libro.getNombre());
-                System.out.println("Autor: " + libro.getAutor());
-                System.out.println("Unidades Disponibles: " + libro.getUnidadesDisponibles());
-                System.out.println("-------------------------------------");
-
+                if (!libro.getNombre().isEmpty()) {
+                    librosEncontrados = true;
+                    System.out.println("-------------------------------------");
+                    System.out.println("ID: " + libro.getId());
+                    System.out.println("Nombre: " + libro.getNombre());
+                    System.out.println("Autor: " + libro.getAutor());
+                    System.out.println("Unidades Disponibles: " + libro.getUnidadesDisponibles());
+                    System.out.println("-------------------------------------");
+                }
+            }
+            if (!librosEncontrados) {
+                System.out.println("La librería está vacía.");
             }
         }
     }
 
-    public static void ModificarUnidades(Libro libro, int cantidad) {
+    public void ModificarUnidades(Libro libro, int cantidad) {
         int unidadesActuales = libro.getUnidadesDisponibles();
         libro.setUnidadesDisponibles(unidadesActuales + cantidad);
+        actualizarUnidadesEnExcel(libro.getId(), libro.getUnidadesDisponibles(), "ListaLibros.xlsx");
     }
 
     public void guardarLibrosEnExcel(String rutaArchivo) {
-        Workbook libro = new XSSFWorkbook();
-        Sheet hoja = libro.createSheet("Libros");
-
-        int rowNum = 0;
-        for (Libro libros : listaLibros) {
-            Row row = hoja.createRow(rowNum++);
-            row.createCell(0).setCellValue(libros.getNombre());
-            row.createCell(1).setCellValue(libros.getAutor());
-            row.createCell(2).setCellValue(libros.getId());
-            row.createCell(3).setCellValue(libros.getUnidadesDisponibles());
-        }
-    
         try {
+            FileInputStream file = new FileInputStream(rutaArchivo);
+            Workbook libro = new XSSFWorkbook(file);
+            Sheet hoja = libro.getSheetAt(0);
+
+            int filaActual = hoja.getLastRowNum() + 1; // Obtener la próxima fila vacía para agregar libros nuevos
+
+            for (Libro libroActual : listaLibros) {
+                if (!existeIdEnExcel(libroActual.getId(), rutaArchivo)) {
+                    Row row = hoja.createRow(filaActual++); // Crear una nueva fila para el libro
+                    row.createCell(0).setCellValue(libroActual.getNombre());
+                    row.createCell(1).setCellValue(libroActual.getAutor());
+                    row.createCell(2).setCellValue(libroActual.getId());
+                    row.createCell(3).setCellValue(libroActual.getUnidadesDisponibles());
+                }
+            }
+
             FileOutputStream outputStream = new FileOutputStream(rutaArchivo);
             libro.write(outputStream);
-            libro.close();
+
+            file.close();
             outputStream.close();
-            System.out.println("Datos de libros guardados en el archivo Excel correctamente.");
+            libro.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-        public void leerLibrosDesdeExcel(String rutaArchivo) {
+
+    public void borrarTodosLosLibrosEnExcel(String rutaArchivo) {
         try {
-            FileInputStream file = new FileInputStream(rutaArchivo); // Ruta al archivo Excel
-            Workbook libro = WorkbookFactory.create(file);
+            FileInputStream file = new FileInputStream(rutaArchivo);
+            Workbook libro = new XSSFWorkbook(file);
+            Sheet hoja = libro.getSheetAt(0);
 
-            Sheet hoja = libro.getSheetAt(0); // Obtener la primera hoja del libro
-            for (Row fila : hoja) {
-                String titulo = fila.getCell(0).getStringCellValue();
-                String autor = fila.getCell(1).getStringCellValue();
-                int id = (int) fila.getCell(2).getNumericCellValue();
-                int unidadesDisponibles = (int) fila.getCell(3).getNumericCellValue();
+            int filas = hoja.getLastRowNum();
+            for (int i = 1; i <= filas; i++) {
+                hoja.removeRow(hoja.getRow(i)); // Eliminar todas las filas excepto la primera (encabezados)
+            }
 
-                // Aquí puedes crear un nuevo libro y agregarlo a la lista de libros en tu Libreria
-                Libro nuevoLibro = new Libro(id, titulo, autor, unidadesDisponibles);
-                listaLibros.add(nuevoLibro);
+            listaLibros.clear(); // Limpiar la lista de libros en memoria
 
-                // O bien, puedes mostrar la información leída del archivo Excel
-                System.out.println("ID: " + id + " - Libro: " + titulo + " - Autor: " + autor + " - Disponibles: " + unidadesDisponibles);
+            FileOutputStream outputStream = new FileOutputStream(rutaArchivo);
+            libro.write(outputStream);
+
+            file.close();
+            outputStream.close();
+            libro.close();
+            System.out.println("Todos los libros han sido borrados satisfactoriamente.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean existeIdEnExcel(int id, String rutaArchivo) {
+        try {
+            FileInputStream file = new FileInputStream(rutaArchivo);
+            Workbook libro = new XSSFWorkbook(file);
+
+            Sheet hoja = libro.getSheetAt(0);
+            // Comenzar desde la segunda fila (índice 1) para omitir el encabezado
+            for (int i = 1; i < hoja.getPhysicalNumberOfRows(); i++) {
+                Row fila = hoja.getRow(i);
+                if (fila != null) {
+                    Cell cell = fila.getCell(2);
+                    if (cell != null && cell.getCellType() == CellType.NUMERIC) {
+                        int idLibro = (int) cell.getNumericCellValue();
+                        if (idLibro == id) {
+                            libro.close();
+                            file.close();
+                            return true;
+                        }
+                    }
+                }
             }
 
             libro.close();
@@ -144,9 +192,60 @@ public class Libreria {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
+
+    private void actualizarUnidadesEnExcel(int idLibro, int nuevasUnidades, String rutaArchivo) {
+        try {
+            FileInputStream file = new FileInputStream(rutaArchivo);
+            Workbook libro = new XSSFWorkbook(file);
+            Sheet hoja = libro.getSheetAt(0);
+
+            for (int i = 1; i <= hoja.getLastRowNum(); i++) {
+                Row fila = hoja.getRow(i);
+                if (fila != null) {
+                    int id = (int) fila.getCell(2).getNumericCellValue();
+                    if (id == idLibro) {
+                        fila.getCell(3).setCellValue(nuevasUnidades); // Actualizar las unidades en el Excel
+                        break;
+                    }
+                }
+            }
+            FileOutputStream outputStream = new FileOutputStream(rutaArchivo);
+            libro.write(outputStream);
+            file.close();
+            outputStream.close();
+            libro.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    public void cargarDatosDesdeExcel(String rutaArchivo) {
+        try {
+            FileInputStream file = new FileInputStream(rutaArchivo);
+            Workbook workbook = new XSSFWorkbook(file);
+            Sheet hoja = workbook.getSheetAt(0);
 
-    
+            listaLibros.clear(); // Limpiar la lista antes de cargar los datos
 
+            for (int i = 1; i <= hoja.getLastRowNum(); i++) {
+                Row fila = hoja.getRow(i);
+                if (fila != null) {
+                    int id = (int) fila.getCell(2).getNumericCellValue();
+                    String nombre = fila.getCell(0).getStringCellValue();
+                    String autor = fila.getCell(1).getStringCellValue();
+                    int unidadesDisponibles = (int) fila.getCell(3).getNumericCellValue();
+
+                    Libro libro = new Libro(id, nombre, autor, unidadesDisponibles);
+                    listaLibros.add(libro);
+                }
+            }
+
+            file.close();
+            workbook.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

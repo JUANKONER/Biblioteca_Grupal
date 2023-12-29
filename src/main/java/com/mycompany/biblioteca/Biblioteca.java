@@ -9,15 +9,17 @@ public class Biblioteca {
 
     public static void main(String[] args) {
 
-        InputOutput inputOutput = new InputOutput();
         Scanner scanner = new Scanner(System.in);
+        InputOutput inputOutput = new InputOutput();
         Libreria libreria = new Libreria();
+        String rutaArchivoExcel = "ListaLibros.xlsx";
+        libreria.cargarDatosDesdeExcel(rutaArchivoExcel);
         int opcion = 0;
         List<Integer> idsExistentes = new ArrayList<>();
 
         boolean esAdmin = false; // Variable para indicar si es administrador o no
         List<String> usuarios = new ArrayList<>(); // Lista de usuarios permitidos para administrar la biblioteca
-        usuarios.add("Admin"); // Nombre de usuario autorizado como administrador
+        usuarios.add("admin"); // Nombre de usuario autorizado como administrador
         usuarios.add("usuario"); // Otro usuario
 
         // Solicitar el nombre de usuario
@@ -40,7 +42,8 @@ public class Biblioteca {
             System.out.println("4. Mostrar todos los libros");
             System.out.println("5. Modificar cantidad de un libro");
             System.out.println("6. Buscar un libro por ID");
-            System.out.println("7. Salir");
+            System.out.println("7. Borrar todo el listado de libros");
+            System.out.println("8. Salir");
             System.out.print("Elige una opción: ");
             System.out.println("\n");
 
@@ -61,10 +64,10 @@ public class Biblioteca {
                             System.out.print("Introduzca el ID del nuevo libro : ");
                             id = inputOutput.leerEntero();
                             idRepetido = idsExistentes.contains(id);
-                            if (idRepetido) {
+                            if (idRepetido || libreria.existeIdEnExcel(id, "ListaLibros.xlsx")) {
                                 System.out.println("El ID del libro ya existe. Por favor, elige otro ID único.");
                             }
-                        } while (idRepetido);
+                        } while (idRepetido || libreria.existeIdEnExcel(id, "ListaLibros.xlsx"));
                         idsExistentes.add(id);
                         System.out.println("Introduzca el nombre del libro a añadir : ");
                         String nombre = inputOutput.leerString();
@@ -74,7 +77,6 @@ public class Biblioteca {
                         int unidadesDisponibles = inputOutput.leerEntero();
                         Libro nuevoLibro = new Libro(id, nombre, autor, unidadesDisponibles);
                         libreria.agregarLibro(nuevoLibro);
-                        System.out.println("Libro agregado con éxito.");
                         break;
 
                     case 2:
@@ -124,6 +126,9 @@ public class Biblioteca {
                             break;
                         }
                     case 7:
+                        libreria.borrarTodosLosLibrosEnExcel("ListaLibros.xlsx");
+                        break;
+                    case 8:
                         System.out.println("¡Hasta luego!");
                         break;
                     default:
@@ -136,7 +141,7 @@ public class Biblioteca {
                 scanner.nextLine();
             }
         } while (opcion
-                != 7);
+                != 8);
         scanner.close();
 
     }
