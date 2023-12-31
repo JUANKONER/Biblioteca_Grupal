@@ -73,13 +73,37 @@ public class Libreria {
     }
 
     public Libro buscarLibroPorId(int id) {
-        for (Libro libro : listaLibros) {
-            if (libro.getId() == id) {
-                return libro;
+    try {
+        FileInputStream file = new FileInputStream("ListaLibros.xlsx");
+        Workbook workbook = new XSSFWorkbook(file);
+        Sheet hoja = workbook.getSheetAt(0);
+
+        for (int i = 1; i <= hoja.getLastRowNum(); i++) {
+            Row fila = hoja.getRow(i);
+            if (fila != null) {
+                int idLibro = (int) fila.getCell(2).getNumericCellValue();
+                if (idLibro == id) {
+                    String nombre = fila.getCell(0).getStringCellValue();
+                    String autor = fila.getCell(1).getStringCellValue();
+                    int unidadesDisponibles = (int) fila.getCell(3).getNumericCellValue();
+                    
+                    // Crear y devolver el libro encontrado en el archivo
+                    Libro libroEncontrado = new Libro(idLibro, nombre, autor, unidadesDisponibles);
+                    file.close();
+                    workbook.close();
+                    return libroEncontrado;
+                }
             }
         }
-        return null;
+        file.close();
+        workbook.close();
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+
+    // Si no se encuentra en el archivo, devolver null
+    return null;
+}
 
     public void mostrarTodosLosLibros() {
         if (listaLibros.isEmpty()) {

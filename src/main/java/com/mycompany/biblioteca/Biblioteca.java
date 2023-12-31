@@ -123,8 +123,9 @@ public class Biblioteca {
                             System.out.println("-------------------------------------");
                         } else {
                             System.out.println("No se encontró ningún libro con el ID " + LibroAconsultar);
-                            break;
                         }
+                            break;
+                        
                     case 7:
                         libreria.borrarTodosLosLibrosEnExcel("ListaLibros.xlsx");
                         break;
