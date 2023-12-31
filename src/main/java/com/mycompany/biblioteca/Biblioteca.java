@@ -17,21 +17,19 @@ public class Biblioteca {
         int opcion = 0;
         List<Integer> idsExistentes = new ArrayList<>();
 
-        boolean esAdmin = false; // Variable para indicar si es administrador o no
-        List<String> usuarios = new ArrayList<>(); // Lista de usuarios permitidos para administrar la biblioteca
-        usuarios.add("admin"); // Nombre de usuario autorizado como administrador
-        usuarios.add("usuario"); // Otro usuario
+        boolean esAdmin = false;
+        List<String> usuarios = new ArrayList<>();
+        usuarios.add("admin");
+        usuarios.add("usuario");
 
-        // Solicitar el nombre de usuario
         System.out.print("Ingrese su nombre de usuario: ");
         String nombreUsuario = inputOutput.leerString();
 
-        // Verificar si el usuario es administrador
         if (usuarios.contains(nombreUsuario)) {
             esAdmin = true;
-            System.out.println("¡Bienvenido, " + nombreUsuario + "! Eres un administrador.");
+            System.out.println("¡Bienvenido, " + nombreUsuario + " tienes permisos de administrador ");
         } else {
-            System.out.println("¡Bienvenido, " + nombreUsuario + "! No eres un administrador.");
+            System.out.println("¡Bienvenido, " + nombreUsuario);
         }
 
         do {
@@ -124,13 +122,13 @@ public class Biblioteca {
                         } else {
                             System.out.println("No se encontró ningún libro con el ID " + LibroAconsultar);
                         }
-                            break;
-                        
+                        break;
+
                     case 7:
                         libreria.borrarTodosLosLibrosEnExcel("ListaLibros.xlsx");
                         break;
                     case 8:
-                        System.out.println("¡Hasta luego!");
+                        System.out.println(" Hasta la proxima ");
                         break;
                     default:
                         System.out.println("Opción no válida. Inténtalo de nuevo.");
